@@ -13,7 +13,7 @@ def country_quantity_pivot() -> DataFrame:
     Dynamic pivot view showing total quantity by country (columns) and year-month (rows).
     Each country becomes a column with quantity values.
     """
-    agg_data = spark.read.table("country_aggregate")
+    agg_data = spark.read.table("retail_pipeline.gold.country_aggregate")
     
     # Create year_month column for better readability (format: YYYY-MM)
     pivoted = (agg_data
