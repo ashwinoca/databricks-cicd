@@ -10,4 +10,8 @@ scratch/**
 **/!explorations/README.md
 .vscode/
 .vscode/**
+.claude/
+docs/
+Task.txt
+deploy.log
 

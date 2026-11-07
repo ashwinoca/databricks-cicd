@@ -2,6 +2,8 @@ from pyspark import pipelines as dp
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, concat_ws, lpad
 
+catalog = spark.conf.get("catalog")
+
 
 @dp.materialized_view(
     table_properties={
@@ -13,7 +15,7 @@ def country_quantity_pivot() -> DataFrame:
     Dynamic pivot view showing total quantity by country (columns) and year-month (rows).
     Each country becomes a column with quantity values.
     """
-    agg_data = spark.read.table("retail_pipeline.gold.country_aggregate")
+    agg_data = spark.read.table(f"{catalog}.gold.country_aggregate")
     
     # Create year_month column for better readability (format: YYYY-MM)
     pivoted = (agg_data

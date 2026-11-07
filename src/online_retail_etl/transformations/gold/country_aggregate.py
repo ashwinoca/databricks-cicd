@@ -2,6 +2,7 @@ from pyspark import pipelines as dp
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, to_date, year, month, sum as spark_sum
 
+catalog = spark.conf.get("catalog")
 
 COUNTRIES = (
     "Australia",
@@ -44,12 +45,12 @@ COUNTRIES = (
 
 
 @dp.materialized_view(
-    name="retail_pipeline.gold.country_aggregate",
+    name=f"{catalog}.gold.country_aggregate",
     comment="Aggregated sales data by country and year-month, including total quantity sold and total sales price."
 )
 def country_aggregate() -> DataFrame:
     """Aggregate total quantity and sales by country and month."""
-    orders = spark.read.table("retail_pipeline.silver.process_orders")
+    orders = spark.read.table(f"{catalog}.silver.process_orders")
 
     aggregated = (orders
         .withColumn("invoice_date", to_date(col("invoicedate"), "M/d/yyyy H:mm"))
@@ -71,10 +72,10 @@ for country in COUNTRIES:
     country_slug = country.lower().replace(" ", "_").replace("-", "_")
 
     @dp.materialized_view(
-        name=f"retail_pipeline.gold.country_aggregate_{country_slug}",
+        name=f"{catalog}.gold.country_aggregate_{country_slug}",
         comment=f"Aggregated sales data by month for {country}.",
     )
     def country_aggregate_by_country(country_filter: str = country) -> DataFrame:
-        return (spark.read.table("retail_pipeline.gold.country_aggregate")
+        return (spark.read.table(f"{catalog}.gold.country_aggregate")
             .filter(col("country") == country_filter)
         )
